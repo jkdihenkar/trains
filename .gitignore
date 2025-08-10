@@ -1,0 +1,8 @@
+# Go binary
+trains
+
+# Cache directory
+cache/
+
+# OS files
+.DS_Store
