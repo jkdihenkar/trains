@@ -155,7 +155,7 @@ func fetchAllTransitPages(baseURL string, cacheEnabled bool) ([]types.TransitRou
 
 // displayTransitRoutes displays and sorts transit routes
 func displayTransitRoutes(routes []types.TransitRoute, limit int, maxDistance int, originalURL string) {
-	fmt.Println("\n=== TOP TRANSIT ROUTES ===\n")
+	fmt.Println("\n=== TOP TRANSIT ROUTES ===")
 	
 	if len(routes) == 0 {
 		fmt.Println("No transit routes found.")
