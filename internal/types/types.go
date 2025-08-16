@@ -4,17 +4,17 @@ import "time"
 
 // TrainData represents train information from etrain.info
 type TrainData struct {
-	Typ  string `json:"typ"`
-	Num  string `json:"num"`
-	Name string `json:"name"`
-	S    string `json:"s"`    // Source station code
-	St   string `json:"st"`   // Source time
-	D    string `json:"d"`    // Destination station code  
-	Dt   string `json:"dt"`   // Destination time
-	Tt   string `json:"tt"`   // Travel time
-	Dy   string `json:"dy"`   // Running days (1=Sun, 2=Mon, etc.)
-	Book string `json:"book"`
-	Arp  int    `json:"arp"`
+	Type               string `json:"typ"`
+	Number             string `json:"num"`
+	Name               string `json:"name"`
+	SourceStationCode  string `json:"s"`    // Source station code
+	SourceTime         string `json:"st"`   // Source time
+	DestStationCode    string `json:"d"`    // Destination station code  
+	DestTime           string `json:"dt"`   // Destination time
+	TravelTime         string `json:"tt"`   // Travel time
+	RunningDays        string `json:"dy"`   // Running days (1=Sun, 2=Mon, etc.)
+	BookingInfo        string `json:"book"`
+	ArrivalPlatform    int    `json:"arp"`
 }
 
 // RouteConnection represents a connection between two trains via intermediate station
