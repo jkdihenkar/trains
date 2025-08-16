@@ -73,11 +73,11 @@ func SaveToCache(url, content string) error {
 	
 	data, err := json.MarshalIndent(entry, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error marshaling cache entry: %v", err)
+		return fmt.Errorf("failed to marshal cache entry for %s: %w", url, err)
 	}
 	
 	if err := os.WriteFile(filePath, data, 0644); err != nil {
-		return fmt.Errorf("error writing cache file: %v", err)
+		return fmt.Errorf("failed to write cache file %s: %w", filePath, err)
 	}
 	
 	fmt.Printf("💾 Cached response for %s\n", url)

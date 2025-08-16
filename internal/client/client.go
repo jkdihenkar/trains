@@ -12,13 +12,13 @@ import (
 func FetchFromNetwork(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("error fetching URL: %v", err)
+		return "", fmt.Errorf("failed to fetch URL %s: %w", url, err)
 	}
 	defer resp.Body.Close()
 	
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error reading response body: %v", err)
+		return "", fmt.Errorf("failed to read response body from %s: %w", url, err)
 	}
 	
 	return string(body), nil
