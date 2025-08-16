@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // TrainData represents train information from etrain.info
 type TrainData struct {
@@ -44,4 +47,27 @@ type CacheEntry struct {
 	URL       string    `json:"url"`
 	Content   string    `json:"content"`
 	Timestamp time.Time `json:"timestamp"`
+}
+
+// String returns a string representation of TrainData
+func (t TrainData) String() string {
+	return fmt.Sprintf("%s %s (%s→%s at %s-%s)", t.Number, t.Name, t.SourceStationCode, t.DestStationCode, t.SourceTime, t.DestTime)
+}
+
+// String returns a string representation of RouteConnection
+func (r RouteConnection) String() string {
+	return fmt.Sprintf("%s + %s | Total: %s | %s", r.Train1.String(), r.Train2.String(), r.TotalTime, r.Connection)
+}
+
+// String returns a string representation of TransitRoute
+func (t TransitRoute) String() string {
+	return fmt.Sprintf("%s (%s) → %s (%s) → %s (%s) | Distance: %s | Trains: %d+%d=%d", 
+		t.SourceStation, t.SourceStationCode, t.TransitStation, t.TransitStationCode, 
+		t.DestStation, t.DestStationCode, t.Distance, t.SourceTrainCount, 
+		t.TransitTrainCount, t.SourceTrainCount+t.TransitTrainCount)
+}
+
+// String returns a string representation of CacheEntry
+func (c CacheEntry) String() string {
+	return fmt.Sprintf("Cache[%s] from %v", c.URL, c.Timestamp.Format("2006-01-02 15:04:05"))
 }
