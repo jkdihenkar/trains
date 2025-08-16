@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// parseTime converts time string to minutes since midnight
-func parseTime(timeStr string) int {
+// ParseTime converts time string to minutes since midnight
+func ParseTime(timeStr string) int {
 	parts := strings.Split(timeStr, ":")
 	if len(parts) != 2 {
 		return 0
@@ -19,8 +19,8 @@ func parseTime(timeStr string) int {
 	return hours*60 + minutes
 }
 
-// parseDistanceKm extracts distance in kilometers from distance string
-func parseDistanceKm(distanceStr string) int {
+// ParseDistanceKm extracts distance in kilometers from distance string
+func ParseDistanceKm(distanceStr string) int {
 	// Parse distance string like "754 Kms" or "1038 Kms"
 	distancePattern := regexp.MustCompile(`(\d+)\s*Kms?`)
 	matches := distancePattern.FindStringSubmatch(distanceStr)
@@ -32,8 +32,8 @@ func parseDistanceKm(distanceStr string) int {
 	return 0
 }
 
-// getCommonRunningDays finds common running days between two trains
-func getCommonRunningDays(days1, days2 string) string {
+// GetCommonRunningDays finds common running days between two trains
+func GetCommonRunningDays(days1, days2 string) string {
 	dayNames := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 	var commonDays []string
 	
@@ -55,8 +55,8 @@ func getCommonRunningDays(days1, days2 string) string {
 	return strings.Join(commonDays, ",")
 }
 
-// formatRunningDays formats running days string for display
-func formatRunningDays(dayStr string) string {
+// FormatRunningDays formats running days string for display
+func FormatRunningDays(dayStr string) string {
 	days := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 	var runningDays []string
 	
@@ -72,8 +72,8 @@ func formatRunningDays(dayStr string) string {
 	return strings.Join(runningDays, ",")
 }
 
-// isUnder19Hours checks if total time is under 19 hours
-func isUnder19Hours(timeStr string) bool {
+// IsUnder19Hours checks if total time is under 19 hours
+func IsUnder19Hours(timeStr string) bool {
 	// Parse time string like "16h 52m"
 	re := regexp.MustCompile(`(\d+)h\s*(\d+)m`)
 	matches := re.FindStringSubmatch(timeStr)
@@ -84,8 +84,8 @@ func isUnder19Hours(timeStr string) bool {
 	return false
 }
 
-// validateAndNormalizeDay validates and normalizes day input
-func validateAndNormalizeDay(day string) (string, error) {
+// ValidateAndNormalizeDay validates and normalizes day input
+func ValidateAndNormalizeDay(day string) (string, error) {
 	day = strings.ToLower(strings.TrimSpace(day))
 	
 	dayMap := map[string]string{
@@ -112,8 +112,8 @@ func validateAndNormalizeDay(day string) (string, error) {
 	return "", fmt.Errorf("invalid day '%s'. Valid options: sun, mon, tue, wed, thu, fri, sat (or full names)", day)
 }
 
-// getDayAbbreviation converts full day name to abbreviation
-func getDayAbbreviation(fullDayName string) string {
+// GetDayAbbreviation converts full day name to abbreviation
+func GetDayAbbreviation(fullDayName string) string {
 	dayMap := map[string]string{
 		"Sunday":    "Sun",
 		"Monday":    "Mon", 
@@ -130,8 +130,8 @@ func getDayAbbreviation(fullDayName string) string {
 	return fullDayName
 }
 
-// shouldFetchAllPages determines if URL requires multi-page fetching
-func shouldFetchAllPages(url string) bool {
+// ShouldFetchAllPages determines if URL requires multi-page fetching
+func ShouldFetchAllPages(url string) bool {
 	// Check if URL is a transit URL without page parameter
 	// Examples: 
 	// - https://etrain.info/transit/BL-NED (should fetch all pages)
