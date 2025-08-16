@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"trains/internal/cache"
 	"trains/internal/client"
 	"trains/internal/parser"
