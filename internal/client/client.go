@@ -1,16 +1,27 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"trains/internal/cache"
 )
 
-// FetchFromNetwork fetches content from network
+// FetchFromNetwork fetches content from network with timeout
 func FetchFromNetwork(url string) (string, error) {
-	resp, err := http.Get(url)
+	// Create context with timeout for the request
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request for %s: %w", url, err)
+	}
+	
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch URL %s: %w", url, err)
 	}
