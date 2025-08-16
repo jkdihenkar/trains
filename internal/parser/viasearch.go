@@ -31,7 +31,7 @@ func ParseTrainData(htmlContent string) []types.TrainData {
 			
 			if i < 5 { // Debug first 5 trains
 				fmt.Printf("Train %d: %s %s from %s(%s) to %s(%s) at %s-%s\n", 
-					i, train.Num, train.Name, train.S, train.St, train.D, train.Dt, train.St, train.Dt)
+					i, train.Number, train.Name, train.SourceStationCode, train.SourceTime, train.DestStationCode, train.DestTime, train.SourceTime, train.DestTime)
 			}
 		}
 	}

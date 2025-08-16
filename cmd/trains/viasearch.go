@@ -95,9 +95,9 @@ func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStatio
 	var transitToDestination []types.TrainData
 	
 	for _, train := range trains {
-		if train.S == sourceStation && train.D == transitStation {
+		if train.SourceStationCode == sourceStation && train.DestStationCode == transitStation {
 			sourceToTransit = append(sourceToTransit, train)
-		} else if train.S == transitStation && train.D == destinationStation {
+		} else if train.SourceStationCode == transitStation && train.DestStationCode == destinationStation {
 			transitToDestination = append(transitToDestination, train)
 		}
 	}
@@ -134,15 +134,15 @@ func analyzeConnection(train1, train2 types.TrainData) types.RouteConnection {
 	}
 	
 	// First check if trains have overlapping running days
-	commonDays := parser.GetCommonRunningDays(train1.Dy, train2.Dy)
+	commonDays := parser.GetCommonRunningDays(train1.RunningDays, train2.RunningDays)
 	if commonDays == "" {
 		connection.Connection = "No Connection - No common running days"
 		return connection
 	}
 	
 	// Parse times
-	time1 := parser.ParseTime(train1.Dt) // Arrival at Kalyan
-	time2 := parser.ParseTime(train2.St) // Departure from Kalyan
+	time1 := parser.ParseTime(train1.DestTime) // Arrival at Kalyan
+	time2 := parser.ParseTime(train2.SourceTime) // Departure from Kalyan
 	
 	// Check if connection is possible (layover between 1-4 hours)
 	layoverMinutes := time2 - time1
@@ -150,8 +150,8 @@ func analyzeConnection(train1, train2 types.TrainData) types.RouteConnection {
 		connection.Connection = fmt.Sprintf("Same day - %dh %dm layover (%s)", layoverMinutes/parser.MinutesPerHour, layoverMinutes%parser.MinutesPerHour, commonDays)
 		
 		// Calculate total journey time
-		startTime := parser.ParseTime(train1.St)
-		endTime := parser.ParseTime(train2.Dt)
+		startTime := parser.ParseTime(train1.SourceTime)
+		endTime := parser.ParseTime(train2.DestTime)
 		if endTime < startTime {
 			endTime += parser.MinutesPerDay // Next day
 		}
@@ -164,8 +164,8 @@ func analyzeConnection(train1, train2 types.TrainData) types.RouteConnection {
 		if layover >= parser.MinLayoverMinutes && layover <= parser.MaxLayoverMinutes {
 			connection.Connection = fmt.Sprintf("Next day - %dh %dm layover (%s)", layover/parser.MinutesPerHour, layover%parser.MinutesPerHour, commonDays)
 			
-			startTime := parser.ParseTime(train1.St)
-			endTime := parser.ParseTime(train2.Dt) + parser.MinutesPerDay // Next day
+			startTime := parser.ParseTime(train1.SourceTime)
+			endTime := parser.ParseTime(train2.DestTime) + parser.MinutesPerDay // Next day
 			totalMinutes := endTime - startTime
 			connection.TotalTime = fmt.Sprintf("%dh %dm", totalMinutes/parser.MinutesPerHour, totalMinutes%parser.MinutesPerHour)
 		} else {
@@ -184,7 +184,7 @@ func analyzeConnection(train1, train2 types.TrainData) types.RouteConnection {
 // connectionMatchesDay checks if connection runs on specified day
 func connectionMatchesDay(connection types.RouteConnection, dayFilter string) bool {
 	// Check if the connection runs on the specified day
-	commonDays := parser.GetCommonRunningDays(connection.Train1.Dy, connection.Train2.Dy)
+	commonDays := parser.GetCommonRunningDays(connection.Train1.RunningDays, connection.Train2.RunningDays)
 	if commonDays == "" {
 		return false
 	}
@@ -218,12 +218,12 @@ func generateConnections(connections []types.RouteConnection, dayFilter string, 
 	
 	for i, conn := range validConnections {
 		fmt.Printf("%d. %s %s + %s %s\n", 
-			i+1, conn.Train1.Num, conn.Train1.Name, conn.Train2.Num, conn.Train2.Name)
+			i+1, conn.Train1.Number, conn.Train1.Name, conn.Train2.Number, conn.Train2.Name)
 		fmt.Printf("   %s %s → %s %s → %s %s\n", 
-			sourceStation, conn.Train1.St, transitStation, conn.Train1.Dt, destinationStation, conn.Train2.Dt)
+			sourceStation, conn.Train1.SourceTime, transitStation, conn.Train1.DestTime, destinationStation, conn.Train2.DestTime)
 		fmt.Printf("   Total Time: %s | Connection: %s\n", 
 			conn.TotalTime, conn.Connection)
 		fmt.Printf("   Days: %s + %s\n\n", 
-			parser.FormatRunningDays(conn.Train1.Dy), parser.FormatRunningDays(conn.Train2.Dy))
+			parser.FormatRunningDays(conn.Train1.RunningDays), parser.FormatRunningDays(conn.Train2.RunningDays))
 	}
 }
