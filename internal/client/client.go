@@ -10,6 +10,11 @@ import (
 	"trains/internal/cache"
 )
 
+// Fetcher defines the interface for fetching content from URLs
+type Fetcher interface {
+	Fetch(url string) (string, error)
+}
+
 // FetchFromNetwork fetches content from network with timeout
 func FetchFromNetwork(url string) (string, error) {
 	// Create context with timeout for the request

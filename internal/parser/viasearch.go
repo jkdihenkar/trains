@@ -40,26 +40,25 @@ func ParseTrainData(htmlContent string) []types.TrainData {
 }
 
 // ExtractRouteInfo extracts source, destination, and transit station codes from URL
-func ExtractRouteInfo(url string) (string, string, string) {
+func ExtractRouteInfo(url string) (sourceStation, destinationStation, transitStation string) {
 	// URL format: https://etrain.info/trains/Valsad-BL-to-H-Sahib-Nanded-NED-via-Kalyan-Jn-KYN
 	// Extract source, destination, and transit station codes
 	
 	// Default fallback values
-	defaultSource := "BL"
-	defaultDestination := "NED" 
-	defaultTransit := "KYN"
+	sourceStation = "BL"
+	destinationStation = "NED" 
+	transitStation = "KYN"
 	
 	// Split by "-via-" to separate main route from transit
 	parts := strings.Split(url, "-via-")
 	if len(parts) < 2 {
-		return defaultSource, defaultDestination, defaultTransit
+		return
 	}
 	
 	mainRoute := parts[0]
 	viaPart := parts[1]
 	
 	// Extract transit station code (last part after final hyphen)
-	transitStation := defaultTransit
 	if strings.Contains(viaPart, "-") {
 		lastHyphen := strings.LastIndex(viaPart, "-")
 		if lastHyphen > 0 && lastHyphen < len(viaPart)-1 {
@@ -71,14 +70,13 @@ func ExtractRouteInfo(url string) (string, string, string) {
 	// Format: ...Source-SRCCODE-to-...Destination-DESTCODE-via-...
 	toIndex := strings.Index(mainRoute, "-to-")
 	if toIndex == -1 {
-		return defaultSource, defaultDestination, transitStation
+		return
 	}
 	
 	sourcePart := mainRoute[:toIndex]
 	destPart := mainRoute[toIndex+4:] // Skip "-to-"
 	
 	// Extract source station code (last part before "-to-")
-	sourceStation := defaultSource
 	if strings.Contains(sourcePart, "-") {
 		lastHyphen := strings.LastIndex(sourcePart, "-")
 		if lastHyphen > 0 && lastHyphen < len(sourcePart)-1 {
@@ -87,7 +85,6 @@ func ExtractRouteInfo(url string) (string, string, string) {
 	}
 	
 	// Extract destination station code (last part before "-via-")
-	destinationStation := defaultDestination
 	if strings.Contains(destPart, "-") {
 		lastHyphen := strings.LastIndex(destPart, "-")
 		if lastHyphen > 0 && lastHyphen < len(destPart)-1 {
@@ -95,5 +92,5 @@ func ExtractRouteInfo(url string) (string, string, string) {
 		}
 	}
 	
-	return sourceStation, destinationStation, transitStation
+	return
 }
