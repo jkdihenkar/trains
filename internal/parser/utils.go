@@ -7,6 +7,20 @@ import (
 	"strings"
 )
 
+const (
+	// Layover time constraints in minutes
+	MinLayoverMinutes = 60  // 1 hour minimum layover
+	MaxLayoverMinutes = 240 // 4 hours maximum layover
+	
+	// Journey time constraint in hours
+	MaxJourneyHours = 19
+	
+	// Time calculations
+	MinutesPerHour = 60
+	HoursPerDay    = 24
+	MinutesPerDay  = 24 * 60
+)
+
 // ParseTime converts time string to minutes since midnight
 func ParseTime(timeStr string) int {
 	parts := strings.Split(timeStr, ":")
@@ -16,7 +30,7 @@ func ParseTime(timeStr string) int {
 	
 	hours, _ := strconv.Atoi(parts[0])
 	minutes, _ := strconv.Atoi(parts[1])
-	return hours*60 + minutes
+	return hours*MinutesPerHour + minutes
 }
 
 // ParseDistanceKm extracts distance in kilometers from distance string
@@ -79,7 +93,7 @@ func IsUnder19Hours(timeStr string) bool {
 	matches := re.FindStringSubmatch(timeStr)
 	if len(matches) >= 3 {
 		hours, _ := strconv.Atoi(matches[1])
-		return hours < 19
+		return hours < MaxJourneyHours
 	}
 	return false
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"trains/internal/cache"
 	"trains/internal/client"
 	"trains/internal/parser"
@@ -145,31 +146,31 @@ func analyzeConnection(train1, train2 types.TrainData) types.RouteConnection {
 	
 	// Check if connection is possible (layover between 1-4 hours)
 	layoverMinutes := time2 - time1
-	if layoverMinutes >= 60 && layoverMinutes <= 240 {
-		connection.Connection = fmt.Sprintf("Same day - %dh %dm layover (%s)", layoverMinutes/60, layoverMinutes%60, commonDays)
+	if layoverMinutes >= parser.MinLayoverMinutes && layoverMinutes <= parser.MaxLayoverMinutes {
+		connection.Connection = fmt.Sprintf("Same day - %dh %dm layover (%s)", layoverMinutes/parser.MinutesPerHour, layoverMinutes%parser.MinutesPerHour, commonDays)
 		
 		// Calculate total journey time
 		startTime := parser.ParseTime(train1.St)
 		endTime := parser.ParseTime(train2.Dt)
 		if endTime < startTime {
-			endTime += 24 * 60 // Next day
+			endTime += parser.MinutesPerDay // Next day
 		}
 		totalMinutes := endTime - startTime
-		connection.TotalTime = fmt.Sprintf("%dh %dm", totalMinutes/60, totalMinutes%60)
+		connection.TotalTime = fmt.Sprintf("%dh %dm", totalMinutes/parser.MinutesPerHour, totalMinutes%parser.MinutesPerHour)
 	} else {
 		// Check next day connection (layover between 1-4 hours)
-		nextDayTime2 := time2 + 24*60
+		nextDayTime2 := time2 + parser.MinutesPerDay
 		layover := nextDayTime2 - time1
-		if layover >= 60 && layover <= 240 {
-			connection.Connection = fmt.Sprintf("Next day - %dh %dm layover (%s)", layover/60, layover%60, commonDays)
+		if layover >= parser.MinLayoverMinutes && layover <= parser.MaxLayoverMinutes {
+			connection.Connection = fmt.Sprintf("Next day - %dh %dm layover (%s)", layover/parser.MinutesPerHour, layover%parser.MinutesPerHour, commonDays)
 			
 			startTime := parser.ParseTime(train1.St)
-			endTime := parser.ParseTime(train2.Dt) + 24*60 // Next day
+			endTime := parser.ParseTime(train2.Dt) + parser.MinutesPerDay // Next day
 			totalMinutes := endTime - startTime
-			connection.TotalTime = fmt.Sprintf("%dh %dm", totalMinutes/60, totalMinutes%60)
+			connection.TotalTime = fmt.Sprintf("%dh %dm", totalMinutes/parser.MinutesPerHour, totalMinutes%parser.MinutesPerHour)
 		} else {
 			// No valid connection
-			if layoverMinutes < 60 || layover < 60 {
+			if layoverMinutes < parser.MinLayoverMinutes || layover < parser.MinLayoverMinutes {
 				connection.Connection = "No Connection - Insufficient layover time"
 			} else {
 				connection.Connection = "No Connection - Layover too long (>4h)"
