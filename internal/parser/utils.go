@@ -21,6 +21,37 @@ const (
 	MinutesPerDay  = 24 * 60
 )
 
+var (
+	// dayNormalizationMap maps input day strings to normalized full day names
+	dayNormalizationMap = map[string]string{
+		"sun":       "Sunday",
+		"sunday":    "Sunday",
+		"mon":       "Monday", 
+		"monday":    "Monday",
+		"tue":       "Tuesday",
+		"tuesday":   "Tuesday", 
+		"wed":       "Wednesday",
+		"wednesday": "Wednesday",
+		"thu":       "Thursday",
+		"thursday":  "Thursday",
+		"fri":       "Friday",
+		"friday":    "Friday",
+		"sat":       "Saturday", 
+		"saturday":  "Saturday",
+	}
+	
+	// dayAbbreviationMap maps full day names to abbreviations
+	dayAbbreviationMap = map[string]string{
+		"Sunday":    "Sun",
+		"Monday":    "Mon", 
+		"Tuesday":   "Tue",
+		"Wednesday": "Wed",
+		"Thursday":  "Thu",
+		"Friday":    "Fri",
+		"Saturday":  "Sat",
+	}
+)
+
 // ParseTime converts time string to minutes since midnight
 func ParseTime(timeStr string) int {
 	parts := strings.Split(timeStr, ":")
@@ -99,46 +130,20 @@ func IsUnder19Hours(timeStr string) bool {
 }
 
 // ValidateAndNormalizeDay validates and normalizes day input
-func ValidateAndNormalizeDay(day string) (string, error) {
+func ValidateAndNormalizeDay(day string) (normalized string, err error) {
 	day = strings.ToLower(strings.TrimSpace(day))
 	
-	dayMap := map[string]string{
-		"sun":       "Sunday",
-		"sunday":    "Sunday",
-		"mon":       "Monday", 
-		"monday":    "Monday",
-		"tue":       "Tuesday",
-		"tuesday":   "Tuesday", 
-		"wed":       "Wednesday",
-		"wednesday": "Wednesday",
-		"thu":       "Thursday",
-		"thursday":  "Thursday",
-		"fri":       "Friday",
-		"friday":    "Friday",
-		"sat":       "Saturday", 
-		"saturday":  "Saturday",
-	}
-	
-	if normalized, ok := dayMap[day]; ok {
+	if normalized, ok := dayNormalizationMap[day]; ok {
 		return normalized, nil
 	}
 	
-	return "", fmt.Errorf("invalid day '%s'. Valid options: sun, mon, tue, wed, thu, fri, sat (or full names)", day)
+	err = fmt.Errorf("invalid day '%s'. Valid options: sun, mon, tue, wed, thu, fri, sat (or full names)", day)
+	return
 }
 
 // GetDayAbbreviation converts full day name to abbreviation
 func GetDayAbbreviation(fullDayName string) string {
-	dayMap := map[string]string{
-		"Sunday":    "Sun",
-		"Monday":    "Mon", 
-		"Tuesday":   "Tue",
-		"Wednesday": "Wed",
-		"Thursday":  "Thu",
-		"Friday":    "Fri",
-		"Saturday":  "Sat",
-	}
-	
-	if abbrev, ok := dayMap[fullDayName]; ok {
+	if abbrev, ok := dayAbbreviationMap[fullDayName]; ok {
 		return abbrev
 	}
 	return fullDayName
