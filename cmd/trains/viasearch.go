@@ -86,11 +86,8 @@ func runViaSearch(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// analyzeConnections finds valid train connections
-func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStation string, destinationStation string, transitStation string) []types.RouteConnection {
-	var connections []types.RouteConnection
-	
-	// Separate trains by route segments using dynamic stations
+// separateTrainsByRoute separates trains into source-to-transit and transit-to-destination segments
+func separateTrainsByRoute(trains []types.TrainData, sourceStation, transitStation, destinationStation string) ([]types.TrainData, []types.TrainData) {
 	var sourceToTransit []types.TrainData
 	var transitToDestination []types.TrainData
 	
@@ -102,6 +99,23 @@ func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStatio
 		}
 	}
 	
+	return sourceToTransit, transitToDestination
+}
+
+// isValidConnection checks if a connection is valid (not a "No Connection" type)
+func isValidConnection(connection types.RouteConnection) bool {
+	return connection.Connection != "No Connection - No common running days" && 
+		   connection.Connection != "No Connection - Insufficient layover time" &&
+		   connection.Connection != "No Connection - Layover too long (>4h)"
+}
+
+// analyzeConnections finds valid train connections
+func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStation string, destinationStation string, transitStation string) []types.RouteConnection {
+	var connections []types.RouteConnection
+	
+	// Separate trains by route segments
+	sourceToTransit, transitToDestination := separateTrainsByRoute(trains, sourceStation, transitStation, destinationStation)
+	
 	fmt.Printf("%s to %s trains: %d\n", sourceStation, transitStation, len(sourceToTransit))
 	fmt.Printf("%s to %s trains: %d\n", transitStation, destinationStation, len(transitToDestination))
 	
@@ -109,17 +123,16 @@ func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStatio
 	for _, train1 := range sourceToTransit {
 		for _, train2 := range transitToDestination {
 			connection := analyzeConnection(train1, train2)
-			if connection.Connection != "No Connection - No common running days" && 
-			   connection.Connection != "No Connection - Insufficient layover time" &&
-			   connection.Connection != "No Connection - Layover too long (>4h)" {
-				
-				// Apply day filter if specified
-				if dayFilter != "" && !connectionMatchesDay(connection, dayFilter) {
-					continue
-				}
-				
-				connections = append(connections, connection)
+			if !isValidConnection(connection) {
+				continue
 			}
+			
+			// Apply day filter if specified
+			if dayFilter != "" && !connectionMatchesDay(connection, dayFilter) {
+				continue
+			}
+			
+			connections = append(connections, connection)
 		}
 	}
 	
