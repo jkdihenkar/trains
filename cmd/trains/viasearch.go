@@ -88,8 +88,8 @@ func runViaSearch(cmd *cobra.Command, args []string) error {
 
 // separateTrainsByRoute separates trains into source-to-transit and transit-to-destination segments
 func separateTrainsByRoute(trains []types.TrainData, sourceStation, transitStation, destinationStation string) ([]types.TrainData, []types.TrainData) {
-	var sourceToTransit []types.TrainData
-	var transitToDestination []types.TrainData
+	sourceToTransit := make([]types.TrainData, 0, len(trains)/2)
+	transitToDestination := make([]types.TrainData, 0, len(trains)/2)
 	
 	for _, train := range trains {
 		if train.SourceStationCode == sourceStation && train.DestStationCode == transitStation {
@@ -111,7 +111,7 @@ func isValidConnection(connection types.RouteConnection) bool {
 
 // analyzeConnections finds valid train connections
 func analyzeConnections(trains []types.TrainData, dayFilter string, sourceStation string, destinationStation string, transitStation string) []types.RouteConnection {
-	var connections []types.RouteConnection
+	connections := make([]types.RouteConnection, 0, 10) // Estimate initial capacity
 	
 	// Separate trains by route segments
 	sourceToTransit, transitToDestination := separateTrainsByRoute(trains, sourceStation, transitStation, destinationStation)

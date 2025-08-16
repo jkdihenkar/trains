@@ -49,7 +49,7 @@ func ParseDistanceKm(distanceStr string) int {
 // GetCommonRunningDays finds common running days between two trains
 func GetCommonRunningDays(days1, days2 string) string {
 	dayNames := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-	var commonDays []string
+	commonDays := make([]string, 0, 7) // Maximum 7 days
 	
 	// Ensure both strings are at least 7 characters
 	if len(days1) < 7 || len(days2) < 7 {
@@ -72,7 +72,7 @@ func GetCommonRunningDays(days1, days2 string) string {
 // FormatRunningDays formats running days string for display
 func FormatRunningDays(dayStr string) string {
 	days := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-	var runningDays []string
+	runningDays := make([]string, 0, 7) // Maximum 7 days
 	
 	for i, char := range dayStr {
 		if i < len(days) && char == '1' {
